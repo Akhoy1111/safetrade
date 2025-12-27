@@ -1,0 +1,12 @@
+# Files to commit:
+✅ src/database/          (NEW - Drizzle schema)
+✅ drizzle.config.js     (NEW - Drizzle config)
+✅ package.json          (Updated - Drizzle deps)
+✅ tsconfig.json         (Updated - ES2021)
+✅ docs/                 (Documentation)
+
+# Files to NOT commit:
+❌ .env                  (Contains passwords - already in .gitignore)
+❌ node_modules/         (Already in .gitignore)
+❌ dist/                 (Build output)
+❌ drizzle/              (Migration files - can commit if needed)

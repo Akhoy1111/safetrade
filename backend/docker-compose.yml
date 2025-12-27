@@ -1,0 +1,33 @@
+# docker-compose.yml
+# Runs PostgreSQL and Redis in containers for local development
+
+version: '3.8'
+
+services:
+  # PostgreSQL - Our main database (stores users, transactions, etc.)
+  postgres:
+    image: postgres:15-alpine
+    container_name: safetrade-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: safetrade
+      POSTGRES_PASSWORD: safetrade123
+      POSTGRES_DB: safetrade
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Redis - For caching and job queues (background jobs, etc.)
+  redis:
+    image: redis:7-alpine
+    container_name: safetrade-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/var/lib/redis/data
+
+volumes:
+  postgres_data:
+  redis_data:

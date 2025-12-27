@@ -1,0 +1,262 @@
+# SafeTrade Backend - Cursor Rules
+# Last Updated: December 27, 2025
+
+## 🎯 Project Overview
+
+**SafeTrade** is a B2B gift card API platform + B2C Telegram Mini App.
+- **Entity:** FluxGateTech FZCO (UAE Free Zone)
+- **Model:** Crypto-only (USDT on TON blockchain)
+- **Pricing:** Value-based (25-30% margins, users save 40-50%)
+- **Focus:** Regional pricing arbitrage (Turkey gift cards)
+
+---
+
+## 📚 Key Documents (ALWAYS Reference These)
+
+| Document | Purpose | Location |
+|----------|---------|----------|
+| **MASTER-PLAN.md** | Business strategy, architecture, product roadmap | `docs/MASTER-PLAN.md` |
+| **PROGRESS.md** | Development status, completed work, next steps | `docs/PROGRESS.md` |
+| **API-REFERENCE.md** | All API endpoints documentation | `docs/API-REFERENCE.md` |
+| **DATABASE.md** | Schema documentation | `docs/DATABASE.md` |
+
+Before starting any task, check `docs/MASTER-PLAN.md` for context and priorities.
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Framework | NestJS + TypeScript |
+| Database | PostgreSQL + Drizzle ORM |
+| IDs | UUID (NEVER auto-increment) |
+| Money | Decimal(18,6) precision |
+| Validation | class-validator + class-transformer |
+| API Style | RESTful with `/api` prefix |
+
+### ⚠️ IMPORTANT: We use Drizzle ORM, NOT Prisma!
+
+---
+
+## 📁 Project Structure
+
+```
+backend/
+├── docs/                    # All documentation
+│   ├── MASTER-PLAN.md      # Business strategy (v3.0)
+│   ├── PROGRESS.md         # Development progress (UPDATE THIS!)
+│   ├── API-REFERENCE.md    # All endpoints
+│   ├── modules/            # Per-module detailed docs
+│   └── guides/             # How-to guides
+├── scripts/                 # SQL seeds, test scripts
+├── src/
+│   ├── database/           # Drizzle schema & connection
+│   ├── users/              # B2C users module
+│   ├── partners/           # B2B partners module
+│   ├── products/           # Product catalog & pricing
+│   ├── orders/             # Order processing
+│   └── [module]/           # Standard module structure
+└── test/                    # Test files
+```
+
+---
+
+## 📝 Coding Standards
+
+### File Naming Convention
+```
+src/[module]/
+├── [module].module.ts        # NestJS module
+├── [module].service.ts       # Business logic
+├── [module].controller.ts    # REST endpoints
+├── dto/
+│   ├── create-[module].dto.ts
+│   ├── update-[module].dto.ts
+│   └── [module]-query.dto.ts
+└── guards/                   # Auth guards (if needed)
+```
+
+### Database Rules
+- ALL primary keys: `uuid('id').defaultRandom().primaryKey()`
+- ALL tables need: `createdAt`, `updatedAt` timestamps
+- Money/balance fields: `decimal('field', { precision: 18, scale: 6 })`
+- Use Drizzle ORM syntax (see `src/database/schema.ts`)
+- NEVER use auto-increment IDs (security risk)
+
+### API Response Format
+```typescript
+// Single item
+{ "id": "uuid", "name": "...", ... }
+
+// List with pagination
+{
+  "data": [...],
+  "total": 100,
+  "page": 1,
+  "limit": 20
+}
+
+// Error
+{
+  "statusCode": 400,
+  "message": "Description",
+  "error": "Bad Request"
+}
+```
+
+### Validation
+- Use class-validator decorators on ALL DTOs
+- Validate UUIDs with `@IsUUID()`
+- Validate required fields with `@IsNotEmpty()`
+- Use `@IsOptional()` for optional fields
+
+---
+
+## 💰 Business Logic Rules
+
+### Value-Based Pricing (CRITICAL!)
+```typescript
+// B2C Price = US Retail × 0.55 (user saves 45%)
+// B2B Price = US Retail × 0.50 (partner discount)
+// Minimum margin = 10% above cost (floor protection)
+
+const b2cPrice = Math.max(
+  usRetailPrice * 0.55,           // Value-based
+  bitrefillCost * 1.10            // Minimum margin
+);
+```
+
+### Partner Balance
+- ALWAYS check balance before orders
+- ALWAYS deduct BEFORE fulfilling order
+- Log ALL balance changes to transactions table
+
+### Products
+- Use `productPricing` table for all pricing
+- Categories: streaming, gaming, app_store, esim, vpn, software, retail
+- Regions: turkey, us, eu, global
+- Focus on Turkey products (highest margins)
+
+---
+
+## ✅ MANDATORY: After Completing ANY Task
+
+### 1. Update PROGRESS.md (REQUIRED!)
+Add entry to `docs/PROGRESS.md`:
+```markdown
+### [Date - e.g., December 27, 2025]
+- ✅ [What was completed]
+- ✅ [Files created/modified]
+- ⏳ Next: [What's next per Master Plan]
+```
+
+### 2. Create/Update Module Documentation
+For new modules, create: `docs/[MODULE]-COMPLETE.md`
+Include:
+- What was created
+- All endpoints with examples
+- Test curl commands
+- Database tables affected
+
+### 3. Update API-REFERENCE.md
+Add any new endpoints to `docs/API-REFERENCE.md`
+
+### 4. Create Test Script
+Add test commands to `scripts/test-[module].sh`
+
+---
+
+## 🚫 Do NOT
+
+- ❌ Use Prisma (we use Drizzle ORM)
+- ❌ Use auto-increment IDs (use UUID)
+- ❌ Skip updating PROGRESS.md
+- ❌ Hardcode prices (use Products table)
+- ❌ Create P2P features (removed from scope)
+- ❌ Create Visa/MC gift card features (removed - high rejection rate)
+- ❌ Forget to check partner balance before orders
+- ❌ Leave sensitive data unvalidated
+
+---
+
+## 🎯 Current Priorities (Per Master Plan v3.0)
+
+Check `docs/MASTER-PLAN.md` Section 12 for current priorities.
+
+As of December 27, 2025:
+1. ✅ Products Module - COMPLETE
+2. 🎯 Integrate Orders with Products - IN PROGRESS
+3. ⏳ Real Bitrefill API integration
+4. ⏳ Webhooks Module
+5. ⏳ Wallets Module (B2C)
+
+---
+
+## 💬 Response Format
+
+When completing a task, always:
+
+1. **Summary** - What was accomplished
+2. **Files Changed** - List of created/modified files
+3. **Test Commands** - How to verify it works
+4. **Documentation Updated** - Confirm PROGRESS.md updated
+5. **Next Steps** - What to do next per Master Plan
+
+Example:
+```
+## ✅ Task Complete: [Module Name]
+
+### Files Created:
+- src/[module]/[module].module.ts
+- src/[module]/[module].service.ts
+- ...
+
+### Test Commands:
+```bash
+curl http://localhost:3000/api/[endpoint]
+```
+
+### Documentation Updated:
+- ✅ docs/PROGRESS.md - Added December 27 entry
+- ✅ docs/[MODULE]-COMPLETE.md - Created
+
+### Next Priority:
+Per Master Plan v3.0: [Next task]
+```
+
+---
+
+## 🔐 Security Checklist
+
+Before completing any financial feature:
+- [ ] UUIDs for all IDs (no enumeration)
+- [ ] Balance checked before deduction
+- [ ] Input validated with DTOs
+- [ ] Errors don't expose internals
+- [ ] Transactions logged for audit
+
+---
+
+## 📞 Quick Reference
+
+### Start Dev Server
+```bash
+npm run start:dev
+```
+
+### Database Commands
+```bash
+npx drizzle-kit generate:pg    # Generate migration
+npx drizzle-kit push:pg        # Apply migration
+docker exec -it safetrade-db psql -U safetrade -d safetrade  # DB shell
+```
+
+### Test API
+```bash
+curl http://localhost:3000/api/[endpoint] | jq
+```
+
+---
+
+# END OF CURSOR RULES
