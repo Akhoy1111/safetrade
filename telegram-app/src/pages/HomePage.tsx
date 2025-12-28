@@ -76,15 +76,23 @@ export default function HomePage() {
         
         {loading ? (
           <div className="text-center py-8 text-telegram-hint">Loading...</div>
+        ) : categories.length === 0 ? (
+          <div className="text-center py-8 text-telegram-hint">No categories available</div>
         ) : (
           <div className="grid grid-cols-2 gap-3">
             {categories.map((cat) => (
               <button
                 key={cat.category}
                 onClick={() => handleCategoryClick(cat.category)}
-                className="bg-telegram-secondaryBg rounded-lg p-4 text-left hover:opacity-80 transition-opacity active:scale-95"
+                className="bg-telegram-secondaryBg rounded-lg p-4 text-left transition-all active:scale-95 active:opacity-70 shadow-sm border border-gray-200"
+                style={{ 
+                  WebkitTapHighlightColor: 'transparent',
+                  touchAction: 'manipulation'
+                }}
               >
-                <div className="text-3xl mb-2">{categoryIcons[cat.category] || '📦'}</div>
+                <div className="text-3xl mb-2" role="img" aria-label={categoryNames[cat.category]}>
+                  {categoryIcons[cat.category] || '📦'}
+                </div>
                 <div className="font-semibold text-telegram-text">
                   {categoryNames[cat.category] || cat.category}
                 </div>

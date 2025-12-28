@@ -7,14 +7,31 @@ export const tg = WebApp;
 
 // Initialize Telegram WebApp
 export const initTelegram = () => {
-  tg.ready();
-  tg.expand();
-  
-  // Set header color
-  tg.setHeaderColor('#2481cc');
-  
-  // Enable closing confirmation
-  tg.enableClosingConfirmation();
+  try {
+    tg.ready();
+    tg.expand();
+    
+    // Set header color
+    tg.setHeaderColor('#2481cc');
+    
+    // Enable closing confirmation
+    tg.enableClosingConfirmation();
+    
+    // Disable vertical swipes if available
+    if (tg.disableVerticalSwipes) {
+      tg.disableVerticalSwipes();
+    }
+    
+    console.log('Telegram WebApp initialized', {
+      version: tg.version,
+      platform: tg.platform,
+      isExpanded: tg.isExpanded,
+      viewportHeight: tg.viewportHeight,
+      viewportStableHeight: tg.viewportStableHeight,
+    });
+  } catch (error) {
+    console.error('Failed to initialize Telegram WebApp:', error);
+  }
 };
 
 // Get Telegram user data

@@ -13,7 +13,7 @@ import type {
   Category 
 } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_URL = 'https://mold-adds-owen-assists.trycloudflare.com/api'
 
 class SafeTradeAPI {
   private client: AxiosInstance;
